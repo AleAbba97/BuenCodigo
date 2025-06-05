@@ -1,0 +1,106 @@
+-- Crea la tabla Cliente -- 
+CREATE TABLE Cliente (	
+	id_cliente INT AUTO_INCREMENT PRIMARY KEY,
+	apellido VARCHAR(100) NOT NULL,
+    	nombre VARCHAR(100) NOT NULL,
+	dni VARCHAR(20) NOT NULL UNIQUE,
+	email VARCHAR(100)
+);
+
+-- Crea la tabla Destinos --
+CREATE TABLE Destinos (	
+	id_destino INT AUTO_INCREMENT PRIMARY KEY,
+	ciudad VARCHAR(50) NOT NULL,
+	pais VARCHAR(50) NOT NULL,
+	costo_base DECIMAL(10,2) NOT NULL
+);
+	
+-- Crea la tabla Ventas --
+CREATE TABLE Ventas(	
+	id_venta INT AUTO_INCREMENT PRIMARY KEY,
+	id_cliente INT NOT NULL,
+	id_destino INT NOT NULL,
+	fecha_venta DATETIME DEFAULT CURRENT_TIMESTAMP,
+	costo DECIMAL(10,2) NOT NULL,
+	estado ENUM('Activa','Anulada') DEFAULT 'Activa',
+	FOREIGN KEY (id_cliente) REFERENCES Cliente(id_cliente),
+	FOREIGN KEY (id_destino) REFERENCES Destinos(id_destino)
+);
+
+-- Crea la tabla Anulaciones --
+CREATE TABLE Anulaciones (
+	id_anulacion INT AUTO_INCREMENT PRIMARY KEY,
+	id_venta INT NOT NULL,
+	fecha_anulacion DATETIME DEFAULT CURRENT_TIMESTAMP,
+	motivo VARCHAR(255),
+	FOREIGN KEY (id_venta) REFERENCES Ventas(id_venta)
+);
+
+-- Inserto valores en la tabla clientes -- 
+INSERT INTO Cliente (apellido, nombre, dni, email)
+VALUES 
+('Garcia', 'Ariel', '33456900', 'agarcia@buencodigo.com'),
+('Torres', 'Ignacio', '29876543', 'itorres@buencodigo.com'),
+('Bazan', 'Camila', '31234567', 'cbazan@buencodigo.com');
+
+-- Insertar valores en la tabla Destino -- 
+INSERT INTO Cliente (cuidad, pais, costo_base)
+VALUES 
+('Roma', 'Italia', '1500000.00')
+('Rio de Janeiro', 'Brasil', '600000.00'),
+('Cataratas', 'Argentina', '300000.00');
+
+-- Insertar valores en la tabla Ventas -- 
+INSERT INTO ventas (id_cliente, id_destino, costo)
+VALUES
+('1', '3', '300000'),
+('2', '1', '1500000'),
+('3', '2', '600000');
+
+-- Insertar valores en la tablaa anulaciones -- 
+INSERT INTO Anulaciones (id_venta, motivo)
+VALUES 
+(2, 'Cliente canceló por motivos personales')
+
+CONSULTAS 
+
+-- Listar todos los clientes -- 
+SELECT * FROM cliente 
+
+--Mostrar venta realizada en una fecha especifica-- 
+SELECT * FROM ventas WHERE DATE (fecha_venta) = '2025-06-05'
+
+-- Obtener la última venta de cada cliente y su fecha --
+SELECT 
+    c.id_cliente,
+    c.nombre,
+    c.apellido,
+    v.id_venta,
+    v.fecha_venta,
+    v.costo,
+    v.estado,
+    d.ciudad,
+    d.pais
+
+FROM Ventas v
+JOIN Cliente c ON v.id_cliente = c.id_cliente
+JOIN Destinos d ON v.id_destino = d.id_destino
+WHERE v.fecha_venta = (
+    SELECT MAX(v2.fecha_venta)
+    FROM Ventas v2
+    WHERE v2.id_cliente = v.id_cliente
+);
+
+-- Obtener Listar todos los destinos que empiezan con “R” --
+SELECT * 
+FROM Destinos
+WHERE ciudad LIKE 'R%';
+
+-- Mostrar cuántas ventas se realizaron por país --
+SELECT 
+    d.pais,
+    COUNT(v.id_venta) AS cantidad_ventas
+FROM Ventas v
+JOIN Destinos d ON v.id_destino = d.id_destino
+GROUP BY d.pais
+ORDER BY cantidad_ventas DESC;
