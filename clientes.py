@@ -7,24 +7,26 @@ def generar_id():
     return ultimo_id
 
 def agregar_cliente():
-    razon_social = input("Ingrese Razón Social: ").strip()
-    cuit = input("Ingrese CUIT: ").strip()
+    nombre = input("Ingrese Nombre: ").strip()
+    apellido = input("Ingrese Apellido: ").strip()
+    dni = input("Ingrese DNI: ").strip()
     email = input("Ingrese Email: ").strip()
 
-    if not razon_social or not cuit or not email:
+    if not nombre or not apellido or not dni or not email:
         print("❌ Todos los campos son obligatorios.")
         return
 
-    # Verificamos que no haya otro cliente con ese CUIT
+    # Verificamos que no haya otro cliente con ese DNI
     for cliente in clientes.values():
-        if cliente["CUIT"] == cuit:
-            print("❌ Ya existe un cliente con ese CUIT.")
+        if cliente["DNI"] == dni:
+            print("❌ Ya existe un cliente con ese DNI.")
             return
 
     nuevo_id = generar_id()
     clientes[nuevo_id] = {
-        "Razon Social": razon_social,
-        "CUIT": cuit,
+        "Nombre": nombre,
+        "Apellido": apellido,
+        "DNI": dni,
         "Email": email,
     }
     print(f"✅ Cliente agregado con ID: {nuevo_id}")
@@ -36,11 +38,14 @@ def modificar_cliente():
         cliente = clientes[id_cliente]
         print(f"Cliente actual: {cliente}")
 
-        nueva_razon = input("Nueva Razón Social (dejar vacío para mantener): ").strip()
+        nuevo_nombre = input("Nuevo Nombre (dejar vacío para mantener): ").strip()
+        nuevo_apellido = input("Nuevo Apellido (dejar vacío para mantener): ").strip()
         nuevo_email = input("Nuevo Email (dejar vacío para mantener): ").strip()
 
-        if nueva_razon:
-            cliente["Razon Social"] = nueva_razon
+        if nuevo_nombre:
+            cliente["Nombre"] = nuevo_nombre
+        if nuevo_apellido:
+            cliente["Apellido"] = nuevo_apellido
         if nuevo_email:
             cliente["Email"] = nuevo_email
 
@@ -52,7 +57,7 @@ def eliminar_cliente():
     print("=== Eliminar cliente ===")
     id_cliente = int(input("Ingrese el ID del cliente a eliminar: "))
     if id_cliente in clientes:
-        confirmacion = input(f"¿Está seguro de eliminar a {clientes[id_cliente]['Razon Social']}? (s/n): ").lower()
+        confirmacion = input(f"¿Está seguro de eliminar a {clientes[id_cliente]['Nombre']} {clientes[id_cliente]['Apellido']}? (s/n): ").lower()
         if confirmacion == 's':
             del clientes[id_cliente]
             print("✅ Cliente eliminado.")
@@ -67,4 +72,4 @@ def ver_clientes():
         print("No hay clientes registrados.")
     else:
         for id_cliente, datos in sorted(clientes.items()):
-            print(f"ID: {id_cliente} | CUIT: {datos['CUIT']} | Razón Social: {datos['Razon Social']} | Email: {datos['Email']}")
+            print(f"ID: {id_cliente} | DNI: {datos['DNI']} | Nombre: {datos['Nombre']} {datos['Apellido']} | Email: {datos['Email']}")
