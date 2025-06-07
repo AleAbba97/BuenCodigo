@@ -30,6 +30,7 @@ def agregar_cliente():
         "Email": email,
     }
     print(f"✅ Cliente agregado con ID: {nuevo_id}")
+    insertar_cliente_bd(apellido, nombre, dni, email)
 
 def modificar_cliente():
     print("=== Modificar cliente ===")
@@ -73,3 +74,27 @@ def ver_clientes():
     else:
         for id_cliente, datos in sorted(clientes.items()):
             print(f"ID: {id_cliente} | DNI: {datos['DNI']} | Nombre: {datos['Nombre']} {datos['Apellido']} | Email: {datos['Email']}")
+
+import mysql.connector
+from mysql.connector import Error
+
+def insertar_cliente_bd(apellido, nombre, dni, email):
+    try:
+        conexion = mysql.connector.connect(
+            host='localhost',
+            user='root',     
+            password='1620',      
+            database='skyroute_db'
+        )
+        cursor = conexion.cursor()
+        sql = "INSERT INTO Cliente (apellido, nombre, dni, email) VALUES (%s, %s, %s, %s)"
+        valores = (apellido, nombre, dni, email)
+        cursor.execute(sql, valores)
+        conexion.commit()
+        print("✅ Cliente guardado en la base de datos.")
+    except Error as e:
+        print(f"❌ Error al insertar en la BD: {e}")
+    finally:
+        if conexion.is_connected():
+            cursor.close()
+            conexion.close()
